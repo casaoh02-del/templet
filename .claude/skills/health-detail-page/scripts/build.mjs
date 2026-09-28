@@ -30,11 +30,23 @@ if (lint.errors.length && !flag('force')) {
 }
 
 // 2) HTML (폰트는 out/fonts/ 로 복사해 오프라인에서도 동일하게 보이게)
-const fontSrc = new URL('./node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2', import.meta.url);
+const fonts = {
+  'PretendardVariable.woff2': './node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2',
+  'PlayfairDisplay.woff2': './node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2',
+  'PlayfairDisplay-Italic.woff2': './node_modules/@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2',
+};
 fs.mkdirSync(path.join(outDir, 'fonts'), { recursive: true });
-fs.copyFileSync(fontSrc, path.join(outDir, 'fonts', 'PretendardVariable.woff2'));
+for (const [name, src] of Object.entries(fonts)) fs.copyFileSync(new URL(src, import.meta.url), path.join(outDir, 'fonts', name));
 const htmlPath = path.join(outDir, 'index.html');
-fs.writeFileSync(htmlPath, renderHtml(content, { projectDir, fontUrl: 'fonts/PretendardVariable.woff2' }));
+fs.writeFileSync(
+  htmlPath,
+  renderHtml(content, {
+    projectDir,
+    fontUrl: 'fonts/PretendardVariable.woff2',
+    displayFontUrl: 'fonts/PlayfairDisplay.woff2',
+    displayItalicUrl: 'fonts/PlayfairDisplay-Italic.woff2',
+  }),
+);
 console.log('✅ HTML: out/index.html');
 if (flag('html-only')) process.exit(0);
 

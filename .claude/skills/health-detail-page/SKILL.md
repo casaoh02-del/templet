@@ -48,7 +48,7 @@ projects/<slug>/
 ### 4. 데이터 — `content.json`
 승인된 기획안을 [references/content-schema.md](references/content-schema.md) 형식으로 옮긴다. `projects/sample-omega3/content.json`이 전체 예시다.
 - `**강조**` = 포인트 컬러, `\n` = 줄바꿈. 줄바꿈은 디자인 의도대로 직접 넣는다(한 줄 12~16자 권장).
-- 브랜드 컬러가 있으면 `theme`에 넣는다.
+- 브랜드 컬러가 있으면 `theme`에 넣는다. 섹션별 `kicker`(영문 키커), `bgWord`(배경 워드마크), 항목별 `icon`으로 완성도를 높인다.
 
 ### 5. 빌드와 검수
 ```bash
@@ -62,7 +62,7 @@ node <skill>/scripts/build.mjs projects/<slug> --scale=2   # 고해상도 PNG
 
 ### 6. 전달
 - **업로드용**: `out/sections/*.png`(섹션별) 또는 `out/detail-full.png`(한 장)
-- **Photoshop**: `out/detail.psd`. 처음 열 때 "텍스트 레이어 업데이트" 창에서 **업데이트**를 누른다. 폰트는 Pretendard 설치 필요.
+- **Photoshop**: `out/detail.psd`. 처음 열 때 "텍스트 레이어 업데이트" 창에서 **업데이트**를 누른다. 폰트는 Pretendard, Playfair Display 설치 필요.
 - **Figma**: `<skill>/figma-plugin`을 Figma 데스크톱 앱의 Plugins → Development → Import plugin from manifest로 등록하고 `out/figma.json`을 선택한다.
 - 마지막 안내: 게재 전 **한국건강기능식품협회 표시·광고 자율심의**를 받고 심의필 번호를 `caution.reviewNumber`에 넣어 다시 빌드한다.
 

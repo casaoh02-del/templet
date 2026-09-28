@@ -69,7 +69,7 @@ node $S/lint.mjs projects/vitamin-d              # 광고 표현 점검만
 ## 편집 파일 여는 법
 
 **Photoshop (PSD)**
-1. [Pretendard](https://github.com/orioncactus/pretendard) 폰트를 설치합니다(무료).
+1. [Pretendard](https://github.com/orioncactus/pretendard)와 [Playfair Display](https://fonts.google.com/specimen/Playfair+Display) 폰트를 설치합니다(모두 무료).
 2. `out/detail.psd`를 열고 "텍스트 레이어를 업데이트하시겠습니까?" 창에서 **업데이트**를 누릅니다.
 3. 섹션별 그룹 안에 배경, 이미지, 도형, 텍스트 레이어가 나뉘어 있습니다.
 

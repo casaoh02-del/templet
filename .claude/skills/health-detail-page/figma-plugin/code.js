@@ -8,19 +8,23 @@ let available = null;
 const fontCache = new Map();
 
 // 요청 폰트 → 같은 굵기의 대체 폰트 순서로 로드
-async function resolveFont(family, style, weight) {
+async function resolveFont(family, style, weight, italic = false) {
   const key = `${family}/${style}`;
   if (fontCache.has(key)) return fontCache.get(key);
   if (!available) available = await figma.listAvailableFontsAsync();
+  const norm = (s) => s.replace(/\s+/g, '');
+  const weightOf = (s) => STYLE_WEIGHT[norm(s).replace(/Italic$/, '') || 'Regular'] ?? 400;
   let chosen = null;
-  for (const fam of [family, ...FALLBACK_FAMILIES]) {
+  // 영문 세리프(Playfair Display 등)가 없으면 세리프 대체, 한글 폰트는 한글 대체 순서로
+  const fallbacks = /playfair|serif/i.test(family) ? ['Playfair Display', 'Noto Serif', 'Georgia'] : FALLBACK_FAMILIES;
+  for (const fam of [family, ...fallbacks]) {
     const styles = available.filter((f) => f.fontName.family === fam).map((f) => f.fontName.style);
     if (!styles.length) continue;
-    const exact = styles.find((s) => s.replace(/\s+/g, '') === style);
-    const nearest = styles
-      .map((s) => ({ s, w: STYLE_WEIGHT[s.replace(/\s+/g, '')] ?? 400 }))
-      .sort((a, b) => Math.abs(a.w - weight) - Math.abs(b.w - weight))[0];
-    chosen = { family: fam, style: exact || nearest.s };
+    const exact = styles.find((s) => norm(s) === norm(style));
+    const sameSlant = styles.filter((s) => /italic/i.test(s) === italic);
+    const pool = sameSlant.length ? sameSlant : styles;
+    const nearest = pool.sort((a, b) => Math.abs(weightOf(a) - weight) - Math.abs(weightOf(b) - weight))[0];
+    chosen = { family: fam, style: exact || nearest };
     break;
   }
   if (!chosen) chosen = { family: 'Inter', style: 'Regular' };
@@ -37,7 +41,7 @@ async function makeText(layer) {
   const node = figma.createText();
   node.name = layer.name;
   const first = t.runs[0];
-  node.fontName = await resolveFont(first.family, first.style, first.weight);
+  node.fontName = await resolveFont(first.family, first.style, first.weight, first.italic);
   node.characters = t.characters;
   node.lineHeight = { unit: 'PIXELS', value: t.lineHeight };
   node.textAlignHorizontal = t.align === 'center' ? 'CENTER' : t.align === 'right' ? 'RIGHT' : 'LEFT';
@@ -45,7 +49,7 @@ async function makeText(layer) {
   for (const r of t.runs) {
     const end = Math.min(i + r.length, t.characters.length);
     if (end > i) {
-      node.setRangeFontName(i, end, await resolveFont(r.family, r.style, r.weight));
+      node.setRangeFontName(i, end, await resolveFont(r.family, r.style, r.weight, r.italic));
       node.setRangeFontSize(i, end, r.size);
       node.setRangeFills(i, end, [paint(r.color)]);
       node.setRangeLetterSpacing(i, end, { unit: 'PIXELS', value: r.letterSpacing || 0 });

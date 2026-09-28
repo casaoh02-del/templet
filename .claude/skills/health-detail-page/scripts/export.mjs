@@ -52,6 +52,7 @@ function extractLayout() {
         size: PX(pcs.fontSize),
         color: parseColor(pcs.color),
         letterSpacing: pcs.letterSpacing === 'normal' ? 0 : PX(pcs.letterSpacing),
+        italic: pcs.fontStyle === 'italic',
       };
       for (let i = 0; i < n.data.length; i++) {
         range.setStart(n, i);
@@ -134,17 +135,28 @@ const decodePng = (buf) => {
   return { width: png.width, height: png.height, data: new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.length) };
 };
 
-async function soloShot(page, id) {
+// 레이어 하나만 투명 배경으로 캡처. 도형·이미지는 그림자가 잘리지 않게 여백(PAD)을 두고 찍는다.
+const PAD = 48;
+async function soloShot(page, layer, pageSize) {
   await page.evaluate((id) => {
     document.documentElement.classList.add('x-solo');
     document.querySelector(`[data-layer-id="${id}"]`).classList.add('x-target');
-  }, id);
-  const buf = await page.locator(`[data-layer-id="${id}"]`).screenshot({ omitBackground: true, animations: 'disabled' });
+  }, layer.id);
+  const pad = layer.kind === 'text' ? 0 : PAD;
+  const x = Math.max(0, Math.floor(layer.x - pad));
+  const y = Math.max(0, Math.floor(layer.y - pad));
+  const clip = {
+    x,
+    y,
+    width: Math.min(pageSize.width, Math.ceil(layer.x + layer.w + pad)) - x,
+    height: Math.min(pageSize.height, Math.ceil(layer.y + layer.h + pad)) - y,
+  };
+  const buf = await page.screenshot({ fullPage: true, clip, omitBackground: true, animations: 'disabled' });
   await page.evaluate((id) => {
     document.documentElement.classList.remove('x-solo');
     document.querySelector(`[data-layer-id="${id}"]`).classList.remove('x-target');
-  }, id);
-  return buf;
+  }, layer.id);
+  return { buf, x, y };
 }
 
 async function sectionBgShot(page, secId) {
@@ -157,7 +169,13 @@ async function sectionBgShot(page, secId) {
 // ── 폰트 이름 매핑 ───────────────────────────────────
 const WEIGHT_STYLE = { 100: 'Thin', 200: 'ExtraLight', 300: 'Light', 400: 'Regular', 500: 'Medium', 600: 'SemiBold', 700: 'Bold', 800: 'ExtraBold', 900: 'Black' };
 const weightStyle = (w) => WEIGHT_STYLE[Math.min(900, Math.max(100, Math.round(w / 100) * 100))];
-const psFontName = (familyName, weight) => `${familyName.replace(/\s+/g, '')}-${weightStyle(weight)}`;
+// PostScript 이름: Pretendard-Bold, PlayfairDisplay-Italic, PlayfairDisplay-SemiBoldItalic
+const styleName = (weight, italic, sep = '') => {
+  const w = weightStyle(weight);
+  if (!italic) return w;
+  return w === 'Regular' ? 'Italic' : `${w}${sep}Italic`;
+};
+const psFontName = (familyName, weight, italic) => `${familyName.replace(/\s+/g, '')}-${styleName(weight, italic)}`;
 
 // ── 메인 ────────────────────────────────────────────
 export async function exportAll({ htmlPath, outDir, scale = 1, psd = true, figma = true, log = console.log }) {
@@ -195,11 +213,12 @@ export async function exportAll({ htmlPath, outDir, scale = 1, psd = true, figma
       return { x: r.left + window.scrollX, y: r.top + window.scrollY };
     });
 
-    const shots = new Map(); // layerId → png buffer
+    const pageSize = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }));
+    const shots = new Map(); // layerId → { buf, x, y } (문서 좌표)
     const bgShots = new Map();
     for (const sec of layout.sections) {
       bgShots.set(sec.id, await sectionBgShot(page, sec.id));
-      for (const l of sec.layers) shots.set(l.id, await soloShot(page, l.id));
+      for (const l of sec.layers) shots.set(l.id, await soloShot(page, l, pageSize));
     }
     await ctx.close();
 
@@ -208,6 +227,8 @@ export async function exportAll({ htmlPath, outDir, scale = 1, psd = true, figma
       sec.x -= page0.x; sec.y -= page0.y;
       for (const l of sec.layers) {
         l.x -= page0.x; l.y -= page0.y;
+        const shot = shots.get(l.id);
+        shot.x -= page0.x; shot.y -= page0.y;
         if (l.text) l.text.baseline -= page0.y;
       }
     }
@@ -234,8 +255,8 @@ function buildPsd(layout, shots, bgShots) {
   const H = Math.round(layout.height);
 
   const makeLayer = (l) => {
-    const img = decodePng(shots.get(l.id));
-    const base = { name: l.name, left: Math.round(l.x), top: Math.round(l.y), imageData: img };
+    const shot = shots.get(l.id);
+    const base = { name: l.name, left: Math.round(shot.x), top: Math.round(shot.y), imageData: decodePng(shot.buf) };
     if (l.kind !== 'text' || !l.text?.text) return base;
     const t = l.text;
     const first = t.runs[0]?.style || {};
@@ -250,7 +271,7 @@ function buildPsd(layout, shots, bgShots) {
         transform: [1, 0, 0, 1, x, t.baseline],
         antiAlias: 'smooth',
         style: {
-          font: { name: psFontName(first.family, first.weight) },
+          font: { name: psFontName(first.family, first.weight, first.italic) },
           fontSize: first.size,
           autoLeading: false,
           leading: t.lineHeight,
@@ -259,7 +280,7 @@ function buildPsd(layout, shots, bgShots) {
         styleRuns: t.runs.map((r) => ({
           length: r.length,
           style: {
-            font: { name: psFontName(r.style.family, r.style.weight) },
+            font: { name: psFontName(r.style.family, r.style.weight, r.style.italic) },
             fontSize: r.style.size,
             autoLeading: false,
             leading: t.lineHeight,
@@ -287,7 +308,10 @@ function buildPsd(layout, shots, bgShots) {
   for (const sec of layout.sections) {
     const full = decodePng(bgShots.get(sec.id));
     blit(composite, W, H, full, Math.round(sec.x), Math.round(sec.y));
-    for (const l of sec.layers) blit(composite, W, H, decodePng(shots.get(l.id)), Math.round(l.x), Math.round(l.y));
+        for (const l of sec.layers) {
+      const shot = shots.get(l.id);
+      blit(composite, W, H, decodePng(shot.buf), Math.round(shot.x), Math.round(shot.y));
+    }
   }
   return writePsdBuffer({ width: W, height: H, imageData: { width: W, height: H, data: composite }, children }, { generateThumbnail: false });
 }
@@ -339,7 +363,8 @@ function buildFigma(layout, shots, bgShots) {
             runs: t.runs.map((r) => ({
               length: r.length,
               family: r.style.family,
-              style: weightStyle(r.style.weight),
+              style: styleName(r.style.weight, r.style.italic, ' '),
+              italic: !!r.style.italic,
               weight: r.style.weight,
               size: r.style.size,
               color: r.style.color,
@@ -347,7 +372,10 @@ function buildFigma(layout, shots, bgShots) {
             })),
           };
         } else {
-          node.image = b64(shots.get(l.id));
+          const shot = shots.get(l.id);
+          const { width: w, height: h } = PNG.sync.read(shot.buf);
+          Object.assign(node, { x: shot.x - sec.x, y: shot.y - sec.y, w, h });
+          node.image = b64(shot.buf);
         }
         return node;
       }),
