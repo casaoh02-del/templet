@@ -1,0 +1,32 @@
+<style>
+  body { font: 13px/1.5 -apple-system, 'Pretendard', sans-serif; margin: 16px; color: #222; }
+  h1 { font-size: 14px; margin: 0 0 8px; }
+  p { margin: 0 0 12px; color: #666; }
+  label { display: block; padding: 14px; border: 1.5px dashed #bbb; border-radius: 8px; text-align: center; cursor: pointer; }
+  label:hover { border-color: #0d99ff; }
+  input { display: none; }
+  #status { margin-top: 12px; min-height: 20px; }
+</style>
+<h1>상세페이지 가져오기</h1>
+<p>빌드 결과물 <b>out/figma.json</b> 파일을 선택하세요.</p>
+<label>figma.json 선택<input id="file" type="file" accept=".json,application/json"></label>
+<div id="status"></div>
+<script>
+  const status = document.getElementById('status');
+  document.getElementById('file').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    status.textContent = '읽는 중…';
+    try {
+      const data = JSON.parse(await file.text());
+      status.textContent = '레이어 만드는 중…';
+      parent.postMessage({ pluginMessage: { type: 'import', data } }, '*');
+    } catch (err) {
+      status.textContent = 'JSON 읽기 실패: ' + err.message;
+    }
+  });
+  onmessage = (e) => {
+    const msg = e.data.pluginMessage;
+    if (msg && msg.type === 'status') status.textContent = msg.text;
+  };
+</script>

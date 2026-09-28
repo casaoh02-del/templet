@@ -1,0 +1,10 @@
+{
+  "name": "상세페이지 가져오기 (Detail Page Importer)",
+  "id": "health-detail-page-importer",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["none"] }
+}

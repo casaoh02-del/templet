@@ -1,0 +1,141 @@
+/* 건강기능식품 상세페이지 기본 테마 — 색상은 content.json의 theme으로 바꾼다 */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #fff; }
+body { font-family: var(--font); color: var(--text); -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: break-word; }
+.page { width: var(--w); margin: 0 auto; }
+em { font-style: normal; color: var(--primary); }
+
+/* ── 섹션 공통 ─────────────────────────────── */
+.sec { position: relative; padding: 120px 64px; text-align: center; overflow: hidden; }
+.tone-light { background: var(--bg); }
+.tone-soft { background: var(--soft); }
+.tone-primary { background: var(--primary); color: #fff; }
+.tone-dark { background: var(--dark); color: #fff; }
+.tone-primary em, .tone-dark em { color: var(--accent); }
+
+.eyebrow { display: inline-block; font-size: 22px; font-weight: 700; letter-spacing: 0.12em; color: var(--primary); margin-bottom: 20px; }
+.tone-primary .eyebrow, .tone-dark .eyebrow { color: var(--accent); }
+.title { font-size: 46px; line-height: 1.32; font-weight: 800; letter-spacing: -0.02em; }
+.title.small { font-size: 34px; text-align: left; margin-bottom: 28px; }
+.body { margin-top: 28px; font-size: 25px; line-height: 1.6; font-weight: 400; color: var(--muted); }
+.tone-primary .body, .tone-dark .body { color: rgba(255,255,255,0.82); }
+.note { margin-top: 36px; font-size: 17px; line-height: 1.55; color: var(--muted); }
+.tone-primary .note, .tone-dark .note { color: rgba(255,255,255,0.6); }
+.closing { margin-top: 48px; font-size: 30px; font-weight: 700; line-height: 1.45; }
+
+.img { margin: 56px auto 0; width: 100%; }
+.img img { display: block; width: 100%; height: auto; }
+.placeholder { aspect-ratio: 4 / 3; border: 3px dashed rgba(0,0,0,0.18); border-radius: 24px; background: rgba(0,0,0,0.035); display: flex; align-items: center; justify-content: center; }
+.tone-primary .placeholder, .tone-dark .placeholder { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.06); }
+.ph-inner { display: flex; flex-direction: column; gap: 10px; padding: 24px; font-size: 20px; color: var(--muted); }
+.ph-inner b { font-size: 22px; letter-spacing: 0.04em; }
+.tone-primary .ph-inner, .tone-dark .ph-inner { color: rgba(255,255,255,0.75); }
+
+/* ── 히어로 ─────────────────────────────── */
+.sec-hero { padding-top: 110px; padding-bottom: 96px; }
+.hero-title { font-size: 66px; line-height: 1.24; font-weight: 800; letter-spacing: -0.03em; }
+.hero-sub { margin-top: 28px; font-size: 27px; line-height: 1.55; color: var(--muted); }
+.hero-img { margin-top: 64px; }
+.hero-img.placeholder { aspect-ratio: 1 / 1; }
+.badges { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 48px; }
+.badge { padding: 14px 26px; border-radius: 999px; background: var(--primary); }
+.badge-t { font-size: 20px; font-weight: 700; color: #fff; }
+
+/* ── 공감(체크리스트) ─────────────────────────── */
+.checks { margin-top: 56px; display: flex; flex-direction: column; gap: 16px; text-align: left; }
+.check { display: flex; align-items: center; gap: 20px; padding: 28px 32px; border-radius: 20px; background: var(--soft); }
+.check-ic { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.check-t { font-size: 24px; line-height: 1.5; font-weight: 500; }
+
+/* ── 기능성 ─────────────────────────────── */
+.claims { margin-top: 56px; display: flex; flex-direction: column; gap: 18px; }
+.claim { padding: 36px 40px; border-radius: 24px; background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.28); text-align: left; }
+.tone-light .claim, .tone-soft .claim { background: #fff; border-color: rgba(0,0,0,0.08); }
+.claim-ing { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+.tone-light .claim-ing, .tone-soft .claim-ing { color: var(--primary); }
+.claim-t { font-size: 28px; line-height: 1.45; font-weight: 700; }
+
+/* ── 원료 ─────────────────────────────── */
+.ings { margin-top: 56px; display: flex; flex-direction: column; gap: 24px; }
+.ing { display: flex; gap: 32px; align-items: center; padding: 32px; border-radius: 24px; background: var(--soft); text-align: left; }
+.tone-soft .ing { background: #fff; }
+.ing-img { flex: none; width: 220px; margin: 0; }
+.ing-img.placeholder { aspect-ratio: 1 / 1; }
+.ing-img.placeholder .ph-inner { font-size: 15px; } .ing-img.placeholder .ph-inner b { font-size: 16px; }
+.ing-txt { flex: 1; }
+.ing-name { font-size: 30px; font-weight: 800; }
+.ing-amt { margin-top: 8px; font-size: 22px; font-weight: 700; color: var(--primary); }
+.ing-desc { margin-top: 14px; font-size: 21px; line-height: 1.6; color: var(--muted); }
+
+/* ── 수치 ─────────────────────────────── */
+.nums { margin-top: 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.num { padding: 44px 16px; border-radius: 24px; background: rgba(255,255,255,0.07); }
+.tone-light .num, .tone-soft .num { background: var(--soft); }
+.num-v { font-size: 64px; font-weight: 800; line-height: 1.1; color: var(--accent); letter-spacing: -0.02em; }
+.tone-light .num-v, .tone-soft .num-v { color: var(--primary); }
+.num-v small { font-size: 26px; font-weight: 700; margin-left: 4px; }
+.num-l { margin-top: 14px; font-size: 21px; line-height: 1.45; font-weight: 500; }
+
+/* ── 비교표 ─────────────────────────────── */
+.cmp { margin-top: 56px; border-radius: 24px; overflow: hidden; background: #fff; border: 1.5px solid rgba(0,0,0,0.08); }
+.cmp-row { display: grid; grid-template-columns: 1.1fr 1fr 1fr; align-items: center; border-top: 1px solid rgba(0,0,0,0.07); }
+.cmp-row:first-child { border-top: 0; }
+.cmp-row > span { padding: 26px 16px; font-size: 21px; line-height: 1.45; }
+.cmp-head > span { font-size: 22px; font-weight: 800; }
+.cmp-k { font-weight: 700; text-align: left; padding-left: 32px !important; color: var(--text); }
+.cmp-c { color: var(--muted); }
+.cmp-c.ours { background: color-mix(in srgb, var(--primary) 7%, transparent); color: var(--primary); font-weight: 700; }
+.cmp-head .cmp-c.ours { background: var(--primary); color: #fff; }
+
+/* ── 품질 ─────────────────────────────── */
+.quals { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.qual { padding: 32px 28px 36px; border-radius: 24px; background: var(--soft); }
+.tone-soft .qual { background: #fff; }
+.qual-img { margin: 0 0 24px; }
+.qual-img.placeholder { aspect-ratio: 1 / 1; }
+.qual-img.placeholder .ph-inner { font-size: 15px; } .qual-img.placeholder .ph-inner b { font-size: 16px; }
+.qual-t { font-size: 25px; font-weight: 800; line-height: 1.4; }
+.qual-d { margin-top: 10px; font-size: 19px; line-height: 1.55; color: var(--muted); }
+
+/* ── 섭취 방법 ─────────────────────────────── */
+.steps { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; text-align: left; }
+.step { display: grid; grid-template-columns: 84px 1fr; column-gap: 20px; padding: 32px; border-radius: 24px; background: var(--soft); }
+.tone-soft .step { background: #fff; }
+.step-n { grid-row: span 2; font-size: 44px; font-weight: 800; color: var(--primary); line-height: 1; }
+.step-t { font-size: 26px; font-weight: 800; line-height: 1.35; }
+.step-d { margin-top: 8px; font-size: 20px; line-height: 1.55; color: var(--muted); }
+
+/* ── 추천 대상 ─────────────────────────────── */
+.targets { margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.target { padding: 34px 24px; border-radius: 20px; background: #fff; border: 1.5px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; }
+.target-t { font-size: 22px; line-height: 1.5; font-weight: 600; }
+
+/* ── FAQ ─────────────────────────────── */
+.faqs { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; text-align: left; }
+.faq { padding: 32px 36px; border-radius: 20px; background: var(--soft); }
+.faq-q { font-size: 24px; font-weight: 800; line-height: 1.45; color: var(--primary); }
+.faq-a { margin-top: 12px; font-size: 20px; line-height: 1.6; color: var(--muted); }
+
+/* ── 제품 정보 / 주의사항 (법정 표기) ─────────────── */
+.sec-info, .sec-caution { padding-top: 80px; padding-bottom: 80px; }
+.info { border-top: 2px solid var(--text); text-align: left; }
+.info-row { display: grid; grid-template-columns: 220px 1fr; border-bottom: 1px solid rgba(0,0,0,0.1); }
+.info-k { padding: 20px 20px; font-size: 18px; font-weight: 700; background: #F7F8F7; line-height: 1.5; }
+.info-v { padding: 20px 24px; font-size: 18px; line-height: 1.5; color: #3A4440; }
+.cautions { text-align: left; padding: 36px 40px; border-radius: 20px; background: #fff; border: 1.5px solid rgba(0,0,0,0.08); }
+.caution-t { font-size: 18px; line-height: 1.7; color: #3A4440; }
+.disclaimer { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 19px; font-weight: 700; line-height: 1.5; }
+.review-no { margin-top: 24px; font-size: 16px; color: var(--muted); text-align: left; }
+
+/* ── 전체 이미지 / 마무리 ─────────────────────────── */
+.sec-image { padding: 0; }
+.full-img { margin: 0; }
+.full-img.placeholder { border-radius: 0; aspect-ratio: 860 / 1100; }
+.sec-cta .img { margin: 0 0 56px; }
+
+/* 레이어 추출용 (export.mjs가 켠다) */
+html.x-bg [data-layer] { visibility: hidden !important; }
+html.x-solo, html.x-solo body { background: transparent !important; }
+html.x-solo * { visibility: hidden !important; }
+html.x-solo .x-target, html.x-solo .x-target * { visibility: visible !important; }
+html.x-solo .x-target [data-layer], html.x-solo .x-target [data-layer] * { visibility: hidden !important; }
